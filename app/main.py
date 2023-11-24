@@ -4,11 +4,12 @@ import uvicorn
 import asyncio
 
 from fastapi import FastAPI
+from motor.motor_asyncio import AsyncIOMotorClient
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
-from app.config.config import DefaultServerSettings
+from app.config.config import DefaultServerSettings, MONGO_URL
 from app.endpoints import all_routes
 
 root_folder = os.path.dirname(os.path.abspath(__file__))
@@ -48,6 +49,8 @@ app.add_middleware(
     allow_credentials=True,
     allow_headers=["*"]
 )
+client = AsyncIOMotorClient(MONGO_URL)
+app.state.mongo_client = client
 
 templates = Jinja2Templates(directory="app/templates")
 @app.get("/")

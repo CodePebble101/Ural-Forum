@@ -4,6 +4,8 @@ services:
     container_name: UF_Backend
     image: dockerpebble/ural-backend:latest
     restart: always
+    depends_on:
+      - mongo_db
     ports:
       - '10090:10090'
     command: bash -c '/app/app.sh'
@@ -13,12 +15,10 @@ services:
     networks:
       - turreta_network
 
-
-
   mongo_db:
     image: mongo
     container_name: UF_MongoDB
-    restart: on-failure
+    restart: always
     ports:
       - "27017:27017"
     networks:
@@ -113,7 +113,10 @@ networks:
   turreta_network:
     driver: bridge
 
-
 volumes:
+  mongodb-data:
+    driver: local
+  mongodb-log:
+    driver: local
   db-data:
     driver: local
