@@ -1,0 +1,119 @@
+version: '3.7'
+services:
+  back:
+    container_name: UF_Backend
+    image: dockerpebble/ural-backend:latest
+    restart: always
+    ports:
+      - '10090:10090'
+    command: bash -c '/app/app.sh'
+    env_file:
+      - envs/.env-docker-dev
+    tty: true
+    networks:
+      - turreta_network
+
+
+
+  mongo_db:
+    image: mongo
+    container_name: UF_MongoDB
+    restart: on-failure
+    ports:
+      - "27017:27017"
+    networks:
+      - turreta_network
+    volumes:
+      - ./init_data.js:/docker-entrypoint-initdb.d/init_data.js
+      - mongodb-log:/var/log/mongodb
+#
+#  web:
+#      container_name: TO_Frontend
+#      restart: always
+#      build:
+#        context: frontend
+#        dockerfile: Dockerfile
+#      image: node:18
+#      tty: true
+#      ports:
+#        - "10091:10091"
+#      networks:
+#        - turreta_network
+#  celery:
+#    container_name: TO_Celery
+#    build:
+#      context: app
+#    command: ["/app/celery.sh", "celery" ]
+#    depends_on:
+#      - redis-cache
+#      - back
+#    networks:
+#      - turreta_network
+#  flower:
+#    container_name: TO_Flower
+#    build:
+#      context: app
+#    command: [  "/app/celery.sh", "flower" ]
+#    depends_on:
+#      - redis-cache
+#      - celery
+#    ports:
+#      - "10095:5555"
+#    networks:
+#      - turreta_network
+#
+#  postgres-main-db:
+#    container_name: TO_DemoMainDatabase
+#    image: postgres:15
+#    restart: always
+#    mem_reservation: 2G
+#    env_file:
+#      - app/config/.env-pg-main-docker
+#    ports:
+#      - "10092:5432"
+#    tty: true
+#    networks:
+#      - turreta_network
+#    volumes:
+#      - db-data:/var/lib/postgresql/data_main
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+#      interval: 15s
+#      timeout: 10s
+#      retries: 7
+#      start_period: 12s
+#
+#  pgadmin:
+#    container_name: TO_pgadmin4
+#    image: dpage/pgadmin4
+#    depends_on:
+#      - postgres-main-db
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: root@root.com
+#      PGADMIN_DEFAULT_PASSWORD: root
+#    ports:
+#      - "10094:80"
+#    networks:
+#      - turreta_network
+#
+#
+#  redis-cache:
+#    image: redis:7
+#    container_name: TO_Redis
+#    restart: always
+#    mem_reservation: 4G
+#    networks:
+#      - turreta_network
+#    command: --port 10096
+#    expose:
+#      - 10096
+
+
+networks:
+  turreta_network:
+    driver: bridge
+
+
+volumes:
+  db-data:
+    driver: local
